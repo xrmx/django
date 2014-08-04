@@ -203,15 +203,20 @@ class Lexer(object):
         """
         Return a list of tokens from a given template_string.
         """
-        in_tag = False
-        result = []
-        for bit in tag_re.split(self.template_string):
-            if bit:
-                result.append(self.create_token(bit, in_tag))
-            in_tag = not in_tag
+        result, upto = [], 0
+        for match in tag_re.finditer(self.template_string):
+            start, end = match.span()
+            if start > upto:
+                result.append(self.create_token(self.template_string[upto:start], (upto, start), False))
+                upto = start
+            result.append(self.create_token(self.template_string[start:end], (start, end), True))
+            upto = end
+        last_bit = self.template_string[upto:]
+        if last_bit:
+            result.append(self.create_token(last_bit, (upto, upto + len(last_bit)), False))
         return result
 
-    def create_token(self, token_string, in_tag):
+    def create_token(self, token_string, source, in_tag):
         """
         Convert the given token string into a new Token object and return it.
         If in_tag is True, we are processing something that matched a tag,
@@ -241,6 +246,7 @@ class Lexer(object):
             token = Token(TOKEN_TEXT, token_string)
         token.lineno = self.lineno
         self.lineno += token_string.count('\n')
+        token.source = self.origin, source
         return token
 
 

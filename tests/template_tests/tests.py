@@ -256,7 +256,7 @@ class TemplateLoaderTests(TestCase):
 
     def test_debug_false_origin(self):
         template = loader.get_template('login.html')
-        self.assertEqual(template.origin, None)
+        self.assertNotEqual(template.origin, None)
 
     # TEMPLATE_DEBUG must be true, otherwise the exception raised
     # during {% include %} processing will be suppressed.

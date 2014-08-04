@@ -83,7 +83,7 @@ class LoaderOrigin(Origin):
 
 
 def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG and display_name:
+    if display_name:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None
